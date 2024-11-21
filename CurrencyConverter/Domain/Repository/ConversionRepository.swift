@@ -6,5 +6,5 @@
 //
 
 protocol ConversionRepository {
-    func loadCurrentRates(baseCurrency: String) -> [Country]
+    func loadCurrentRates(baseCurrency: String) -> [String : Double]
 }

@@ -6,7 +6,7 @@
 //
 
 protocol ConversionUseCase {
-    func loadCurrentRates(baseCurrency: String) -> [Country]
+    func loadCurrentRates(baseCurrency: String) -> [String : Double]
 }
 
 class ConversionUseCaseImpl: ConversionUseCase {
@@ -16,7 +16,7 @@ class ConversionUseCaseImpl: ConversionUseCase {
         self.repository = repository
     }
     
-    func loadCurrentRates(baseCurrency: String) -> [Country] {
+    func loadCurrentRates(baseCurrency: String) -> [String : Double] {
         return repository.loadCurrentRates(baseCurrency: baseCurrency)
     }
 }

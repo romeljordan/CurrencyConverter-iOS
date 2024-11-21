@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ConverterScreenView: View {
-    @ObservedObject var viewModel: ConverterViewModel = ConverterViewModel()
+    @ObservedObject var viewModel: ConverterViewModel = ConverterViewModel(conversionUseCase: ConversionUseCaseImpl(repository: ConversionRepositoryImpl()), countryUseCase: CountryUsecaseImpl(repository: CountryRepositoryImpl()))
     
     @State var value: Double = 0
     

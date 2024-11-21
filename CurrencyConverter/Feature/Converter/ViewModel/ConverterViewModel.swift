@@ -13,24 +13,26 @@ extension ConverterScreenView {
         @Published private(set) var rates: [String: Double] = [:]
         @Published private(set) var countryConvertList: [String] = []
         @Published private(set) var baseCountry: String = "us"
+        
+        private let conversionUseCase: ConversionUseCase
+        private let countryUseCase: CountryUsecase
 
-        init() {
+        init(conversionUseCase: ConversionUseCase, countryUseCase: CountryUsecase) {
+            self.conversionUseCase = conversionUseCase
+            self.countryUseCase = countryUseCase
+            
             load()
         }
         
         func load() {
-            countries = [
-                Country(name: "Vietnam", code: "vn", currency: Currency(name: "Vietnam Dong", code: "vnd")),
-                Country(name: "Philippines", code: "ph", currency: Currency(name: "Philippine Peso", code: "php")),
-                Country(name: "USA", code: "us", currency: Currency(name: "US Dollar", code: "usd"))
-            ]
+            countries = countryUseCase.loadCountries()
             
             loadCurrentRates()
         }
         
         func loadCurrentRates() {
-            // TODO: use baseCurrency value for api call
-            rates = ["vnd": 25341.081325824, "php": 58.86849795]
+            guard let baseCurrency = getCurrency(code: baseCountry) else { return }
+            rates = conversionUseCase.loadCurrentRates(baseCurrency: baseCurrency.code)
         }
         
         func getCurrency(code: String) -> Currency? {

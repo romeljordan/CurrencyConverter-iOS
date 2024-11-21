@@ -5,13 +5,9 @@
 //  Created by androiddev on 11/21/24.
 //
 
-class ConversionRepositoryImpl : ConversionRepository {
-    func loadCurrentRates(baseCurrency: String) -> [Country] {
-        return [
-            Country(name: "Vietnam", code: "vn", currency: Currency(name: "Vietnam Dong", code: "vnd")),
-            Country(name: "Philippines", code: "ph", currency: Currency(name: "Philippine Peso", code: "php")),
-            Country(name: "USA", code: "us", currency: Currency(name: "US Dollar", code: "usd"))
-        ]
+final class ConversionRepositoryImpl : ConversionRepository {
+    func loadCurrentRates(baseCurrency: String) -> [String : Double] {
+        return ["vnd": 25341.081325824, "php": 58.86849795]
         // TODO: add real data from api
     }
 }
