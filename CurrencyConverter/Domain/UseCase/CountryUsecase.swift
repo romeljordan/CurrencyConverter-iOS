@@ -5,8 +5,10 @@
 //  Created by androiddev on 11/21/24.
 //
 
+import RxSwift
+
 protocol CountryUsecase {
-    func loadCountries() -> [Country]
+    func loadCountries() -> Single<[Country]>
 }
 
 class CountryUsecaseImpl : CountryUsecase {
@@ -16,7 +18,18 @@ class CountryUsecaseImpl : CountryUsecase {
         self.repository = repository
     }
     
-    func loadCountries() -> [Country] {
-        return repository.loadCountries()
+    func loadCountries() -> Single<[Country]> {
+        return Single.create { [weak self] single in
+            self!.repository.loadCountries().subscribe(
+                onSuccess: { items in
+                    single(.success(items.map({ dto in
+                        dto.toDomainModel()
+                    })))
+                },
+                onFailure: { error in
+                    single(.failure(error))
+                }
+            )
+        }
     }
 }

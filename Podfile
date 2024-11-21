@@ -7,5 +7,6 @@ target 'CurrencyConverter' do
 
   # Pods for CurrencyConverter
   pod 'Alamofire'
+  pod 'RxSwift'
 
 end

@@ -25,13 +25,23 @@ extension ConverterScreenView {
         }
         
         func load() {
-            countries = countryUseCase.loadCountries()
+            countryUseCase.loadCountries().subscribe { event in
+                switch event {
+                case .success(let value):
+                    self.countries = value
+                    print("[DEBUG:API] country list: \(value)")
+                    self.loadCurrentRates()
+                case .failure(let error):
+                    print("Error fetching list of countries: \(error)")
+                }
+            }
             
-            loadCurrentRates()
+            // loadCurrentRates() TODO: perform api after loading countries
         }
         
         func loadCurrentRates() {
             guard let baseCurrency = getCurrency(code: baseCountry) else { return }
+            
             rates = conversionUseCase.loadCurrentRates(baseCurrency: baseCurrency.code)
         }
         
