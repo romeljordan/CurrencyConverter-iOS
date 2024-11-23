@@ -29,7 +29,6 @@ extension ConverterScreenView {
                 switch event {
                 case .success(let value):
                     self.countries = value
-                    print("[DEBUG:API] country list: \(value)")
                     self.loadCurrentRates()
                 case .failure(let error):
                     print("Error fetching list of countries: \(error)")
@@ -46,10 +45,9 @@ extension ConverterScreenView {
         }
         
         func getCurrency(code: String) -> Currency? {
-            return countries
-                .filter({ $0.code == code })
-                .map({ $0.currency })
-                .first
+            guard let country = getCountry(for: code) else { return nil }
+            
+            return country.currency
         }
         
         func addCountryFromConversion(code: String) {
@@ -60,6 +58,10 @@ extension ConverterScreenView {
         
         func removeCountryFromConversion(code: String) {
             countryConvertList.removeAll(where: { code == $0 })
+        }
+        
+        private func getCountry(for code: String) -> Country? {
+            return countries.filter({ $0.code.lowercased() == code.lowercased() }).first
         }
     }
 }

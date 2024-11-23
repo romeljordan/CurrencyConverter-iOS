@@ -44,7 +44,7 @@ struct ConverterScreenView: View {
                     ForEach(viewModel.countryConvertList, id: \.self) { code in
                         let currency = viewModel.getCurrency(code: code)
                         if (currency != nil) {
-                            CurrencyRowView(currency: currency!, countryCode: code, value: value * (viewModel.rates[currency!.code] ?? 0))
+                            CurrencyRowView(currency: currency!, countryCode: code, value: value * (viewModel.rates[currency!.code.lowercased()] ?? 0))
                         }
                     }
                 }
