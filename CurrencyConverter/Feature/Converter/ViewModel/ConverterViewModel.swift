@@ -50,9 +50,11 @@ extension ConverterScreenView {
             return country.currency
         }
         
-        func addCountryFromConversion(code: String) {
-            if (!countryConvertList.contains(code)) {
-                countryConvertList.append(code)
+        func addCountryFromConversion(countryList: [String]) {
+            countryList.forEach { code in
+                if (!countryConvertList.contains(code)) {
+                    countryConvertList.append(code)
+                }
             }
         }
         
@@ -60,8 +62,24 @@ extension ConverterScreenView {
             countryConvertList.removeAll(where: { code == $0 })
         }
         
+        func updateBaseCountry(code: String) {
+            baseCountry = code
+        }
+        
+        func updateSelectedCountryToConvert(old: String, new: String) {
+            guard let index = countryConvertList.firstIndex(where: { $0 == old }) else { return }
+            
+            countryConvertList[index] = new
+        }
+        
         private func getCountry(for code: String) -> Country? {
             return countries.filter({ $0.code.lowercased() == code.lowercased() }).first
         }
+    }
+    
+    enum InputType: Equatable {
+        case base
+        case converted(current: String)
+        case new
     }
 }

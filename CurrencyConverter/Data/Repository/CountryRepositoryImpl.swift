@@ -12,7 +12,7 @@ final class CountryRepositoryImpl : CountryRepository {
     
     func loadCountries() -> Single<[CountryDto]> {
         return Single.create { single in
-            let request = AF.request("https://restcountries.com/v3.1/all?fields=currencies,cca2")
+            let request = AF.request("https://restcountries.com/v3.1/all?fields=name,currencies,cca2")
                 .validate()
                 .responseDecodable(of: Array<CountryDto>.self) { response in
                     switch response.result {

@@ -47,8 +47,6 @@ struct CurrencyRowView: View {
                 
                 Image("arrowDropDown")
                     .foregroundStyle(.tint)
-            }.onTapGesture {
-                
             }
             
             HStack(alignment: .lastTextBaseline) {
