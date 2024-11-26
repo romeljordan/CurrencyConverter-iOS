@@ -63,7 +63,8 @@ struct SearchListScreenView: View {
             
             ScrollView(.vertical) {
                 LazyVStack(spacing: 8) {
-                    ForEach(list, id: \.self) { item in
+                    let shownList = getSortedList()
+                    ForEach(shownList, id: \.self) { item in
                         SearchItemView(
                             countryCode: item.code,
                             name: item.name,
@@ -89,9 +90,23 @@ struct SearchListScreenView: View {
         .padding()
         .background(Color.black)
     }
+    
+    private func getSortedList() -> [Country] {
+        if (searchText.isEmpty) {
+            return list
+        }
+        
+        return if (searchText.count == 1) {
+            list.filter { country in
+                country.name.first?.lowercased() ==  searchText.first?.lowercased()
+            }
+        } else {
+            list.filter { country in
+                country.name.lowercased().contains(searchText.lowercased())
+            }
+        }
+    }
 }
-
-
 
 #Preview {
     SearchListScreenView(
