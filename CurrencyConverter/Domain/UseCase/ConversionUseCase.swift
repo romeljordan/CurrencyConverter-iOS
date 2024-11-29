@@ -5,8 +5,10 @@
 //  Created by androiddev on 11/21/24.
 //
 
+import RxSwift
+
 protocol ConversionUseCase {
-    func loadCurrentRates(baseCurrency: String) -> [String : Double]
+    func loadCurrentRates(baseCurrency: String) -> Single<[String : Double]>
 }
 
 class ConversionUseCaseImpl: ConversionUseCase {
@@ -16,7 +18,7 @@ class ConversionUseCaseImpl: ConversionUseCase {
         self.repository = repository
     }
     
-    func loadCurrentRates(baseCurrency: String) -> [String : Double] {
+    func loadCurrentRates(baseCurrency: String) -> Single<[String : Double]> {
         return repository.loadCurrentRates(baseCurrency: baseCurrency)
     }
 }

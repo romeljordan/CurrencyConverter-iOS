@@ -46,17 +46,15 @@ struct ConverterScreenView: View {
             ScrollView(.vertical) {
                 LazyVStack(spacing: 0) {
                     ForEach(viewModel.countryConvertList, id: \.self) { code in
-                        let currency = viewModel.getCurrency(code: code)
-                        if (currency != nil) {
+                        guard let currency = viewModel.getCurrency(code: code) else { return }
                             CurrencyRowView(
                                 currency: currency!,
                                 countryCode: code,
-                                value: value * (viewModel.rates[currency!.code.lowercased()] ?? 0)
+                                value: value * (viewModel.getConversionRate(for: currency!.code))
                             ).onTapGesture {
                                 isCountryListPopupShown = true
                                 inputType = .converted(current: code)
                             }
-                        }
                     }
                 }
             }

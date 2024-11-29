@@ -6,8 +6,27 @@
 //
 
 import Foundation
+import RxSwift
 
 extension ConverterScreenView {
+    struct ConverterScreenViewState {
+        var countryList: [Country] = []
+        var latestRates: [String : Double] = [:]
+        var selectedCountryList: [String] = []
+        var baseCountry: String = "us"
+        
+        mutating func update(
+            countryList: [Country]? = nil,
+            latestRates: [String : Double]? = nil,
+            selectedCountryList: [String]? = nil,
+            baseCountry: String? = nil
+        ) {
+            if countryList != nil {
+                self.countryList = countryList!
+            }
+        }
+    }
+    
     class ConverterViewModel: ObservableObject {
         @Published private(set) var countries: [Country] = []
         @Published private(set) var rates: [String: Double] = [:]
@@ -16,6 +35,8 @@ extension ConverterScreenView {
         
         private let conversionUseCase: ConversionUseCase
         private let countryUseCase: CountryUsecase
+        
+        private let disposedBag = DisposeBag()
 
         init(conversionUseCase: ConversionUseCase, countryUseCase: CountryUsecase) {
             self.conversionUseCase = conversionUseCase
@@ -34,14 +55,23 @@ extension ConverterScreenView {
                     print("Error fetching list of countries: \(error)")
                 }
             }
-            
-            // loadCurrentRates() TODO: perform api after loading countries
+            .disposed(by: disposedBag)
         }
         
         func loadCurrentRates() {
             guard let baseCurrency = getCurrency(code: baseCountry) else { return }
-            
-            rates = conversionUseCase.loadCurrentRates(baseCurrency: baseCurrency.code)
+            conversionUseCase
+                .loadCurrentRates(baseCurrency: baseCurrency.code)
+                .subscribe { event in
+                    switch event {
+                    case.success(let value):
+                        self.rates = value
+                        print("[DEBUG] rates: \(self.rates)")
+                    case .failure(let error):
+                        print("Error fetching of current rates: \(error)")
+                    }
+                }
+                .disposed(by: disposedBag)
         }
         
         func getCurrency(code: String) -> Currency? {
@@ -63,13 +93,22 @@ extension ConverterScreenView {
         }
         
         func updateBaseCountry(code: String) {
+            let refresh = (baseCountry != code)
             baseCountry = code
+    
+            if (refresh) {
+                loadCurrentRates()
+            }
         }
         
         func updateSelectedCountryToConvert(old: String, new: String) {
             guard let index = countryConvertList.firstIndex(where: { $0 == old }) else { return }
             
             countryConvertList[index] = new
+        }
+        
+        func getConversionRate(for code: String) -> Double {
+            return rates[code.uppercased()] ?? 0
         }
         
         private func getCountry(for code: String) -> Country? {
