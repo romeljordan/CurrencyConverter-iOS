@@ -13,7 +13,7 @@ extension ConverterScreenView {
         var countryList: [Country] = []
         var latestRates: [String : Double] = [:]
         var selectedCountryList: [String] = []
-        var baseCountry: String = "us"
+        var baseCountry: String = ""
         
         mutating func update(
             countryList: [Country]? = nil,
@@ -24,14 +24,28 @@ extension ConverterScreenView {
             if countryList != nil {
                 self.countryList = countryList!
             }
+            
+            if latestRates != nil {
+                self.latestRates = latestRates!
+            }
+            
+            if selectedCountryList != nil {
+                self.selectedCountryList = selectedCountryList!
+            }
+            
+            if baseCountry != nil {
+                self.baseCountry = baseCountry!
+            }
         }
     }
     
     class ConverterViewModel: ObservableObject {
-        @Published private(set) var countries: [Country] = []
-        @Published private(set) var rates: [String: Double] = [:]
-        @Published private(set) var countryConvertList: [String] = []
-        @Published private(set) var baseCountry: String = "us"
+//        @Published private(set) var countries: [Country] = []
+//        @Published private(set) var rates: [String: Double] = [:]
+//        @Published private(set) var countryConvertList: [String] = []
+//        @Published private(set) var baseCountry: String = "us"
+        
+        @Published private(set) var screenState: ConverterScreenViewState = ConverterScreenViewState(baseCountry: "us")
         
         private let conversionUseCase: ConversionUseCase
         private let countryUseCase: CountryUsecase
@@ -49,7 +63,8 @@ extension ConverterScreenView {
             countryUseCase.loadCountries().subscribe { event in
                 switch event {
                 case .success(let value):
-                    self.countries = value
+//                    self.countries = value
+                    self.screenState.update(countryList: value)
                     self.loadCurrentRates()
                 case .failure(let error):
                     print("Error fetching list of countries: \(error)")
@@ -59,14 +74,15 @@ extension ConverterScreenView {
         }
         
         func loadCurrentRates() {
-            guard let baseCurrency = getCurrency(code: baseCountry) else { return }
+            guard let baseCurrency = getCurrency(code: screenState.baseCountry) else { return }
             conversionUseCase
                 .loadCurrentRates(baseCurrency: baseCurrency.code)
                 .subscribe { event in
                     switch event {
                     case.success(let value):
-                        self.rates = value
-                        print("[DEBUG] rates: \(self.rates)")
+                        self.screenState.update(latestRates: value)
+//                        self.rates = value
+//                        print("[DEBUG] rates: \(self.rates)")
                     case .failure(let error):
                         print("Error fetching of current rates: \(error)")
                     }
@@ -82,19 +98,25 @@ extension ConverterScreenView {
         
         func addCountryFromConversion(countryList: [String]) {
             countryList.forEach { code in
-                if (!countryConvertList.contains(code)) {
-                    countryConvertList.append(code)
+                if (!screenState.selectedCountryList.contains(code)) {
+//                    countryConvertList.append(code)
+                    var copy = screenState.selectedCountryList.map { $0 }
+                    copy.append(code)
+                    screenState.update(selectedCountryList: copy)
                 }
             }
         }
         
         func removeCountryFromConversion(code: String) {
-            countryConvertList.removeAll(where: { code == $0 })
+            var copy = screenState.selectedCountryList.map { $0 }
+            copy.removeAll(where: { code == $0 })
+                
+            screenState.update(selectedCountryList: copy)
         }
         
         func updateBaseCountry(code: String) {
-            let refresh = (baseCountry != code)
-            baseCountry = code
+            let refresh = (screenState.baseCountry != code)
+            screenState.update(baseCountry: code)
     
             if (refresh) {
                 loadCurrentRates()
@@ -102,17 +124,20 @@ extension ConverterScreenView {
         }
         
         func updateSelectedCountryToConvert(old: String, new: String) {
-            guard let index = countryConvertList.firstIndex(where: { $0 == old }) else { return }
+            guard let index = screenState.selectedCountryList.firstIndex(where: { $0 == old }) else { return }
             
-            countryConvertList[index] = new
+            var copy = screenState.selectedCountryList.map { $0 }
+            copy[index] = new
+            
+            screenState.update(selectedCountryList: copy)
         }
         
         func getConversionRate(for code: String) -> Double {
-            return rates[code.uppercased()] ?? 0
+            return screenState.latestRates[code.uppercased()] ?? 0
         }
         
         private func getCountry(for code: String) -> Country? {
-            return countries.filter({ $0.code.lowercased() == code.lowercased() }).first
+            return screenState.countryList.filter({ $0.code.lowercased() == code.lowercased() }).first
         }
     }
     

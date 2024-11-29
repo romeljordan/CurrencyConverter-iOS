@@ -33,11 +33,11 @@ struct ConverterScreenView: View {
                 }
             }
             
-            let baseCurrency = viewModel.getCurrency(code: viewModel.baseCountry)
+            let baseCurrency = viewModel.getCurrency(code: viewModel.screenState.baseCountry)
             if (baseCurrency != nil) {
                 BaseCurrencyRowView(
                     currency: baseCurrency!,
-                    countryCode: viewModel.baseCountry
+                    countryCode: viewModel.screenState.baseCountry
                 ) { newValue in
                     value = newValue
                 }
@@ -45,8 +45,8 @@ struct ConverterScreenView: View {
             
             ScrollView(.vertical) {
                 LazyVStack(spacing: 0) {
-                    ForEach(viewModel.countryConvertList, id: \.self) { code in
-                        guard let currency = viewModel.getCurrency(code: code) else { return }
+                    ForEach(viewModel.screenState.selectedCountryList, id: \.self) { code in
+                        let currency = viewModel.getCurrency(code: code)
                             CurrencyRowView(
                                 currency: currency!,
                                 countryCode: code,
@@ -64,15 +64,15 @@ struct ConverterScreenView: View {
         .sheet(isPresented: $isCountryListPopupShown, content: {
             let selectedList = switch inputType {
             case .base:
-                [viewModel.baseCountry]
+                [viewModel.screenState.baseCountry]
             case .converted(let current):
                 [current]
             case .new:
-                viewModel.countryConvertList
+                viewModel.screenState.selectedCountryList
             }
             
             SearchListScreenView(
-                list: viewModel.countries,
+                list: viewModel.screenState.countryList,
                 initialSelected: selectedList,
                 isMultiple: (inputType == .new),
                 onResults: { result in
