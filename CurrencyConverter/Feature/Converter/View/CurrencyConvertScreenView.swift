@@ -47,7 +47,11 @@ struct CurrencyConvertScreenView: View {
             if (baseCurrency != nil) {
                 BaseCurrencyRowView(
                     currency: baseCurrency!,
-                    countryCode: viewModel.screenState.baseCountry
+                    countryCode: viewModel.screenState.baseCountry,
+                    onUpdateValueListener: {
+                        isCountryListPopupShown = true
+                        inputType = .base
+                    }
                 ) { newValue in
                     value = newValue
                 }
@@ -87,10 +91,10 @@ struct CurrencyConvertScreenView: View {
                 onResults: { result in
                     switch inputType {
                     case .base:
-                        guard let code = result.first else { return }
+                        guard let code = result.first else { break }
                         viewModel.updateBaseCountry(code: code)
                     case .converted(let current):
-                        guard let newCode = result.first else { return }
+                        guard let newCode = result.first else { break }
                         viewModel.updateSelectedCountryToConvert(old: current, new: newCode)
                     case .new:
                         viewModel.addCountryToSelection(countryList: result)
