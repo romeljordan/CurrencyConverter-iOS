@@ -5,7 +5,7 @@
 //  Created by androiddev on 11/20/24.
 //
 
-struct Currency {
+struct Currency: Hashable {
     var name: String
     var code: String
     

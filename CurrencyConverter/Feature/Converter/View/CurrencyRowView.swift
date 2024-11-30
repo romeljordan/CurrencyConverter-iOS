@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  CurrencyRowView.swift
 //  CurrencyConverter
 //
 //  Created by androiddev on 11/18/24.
@@ -47,8 +47,6 @@ struct CurrencyRowView: View {
                 
                 Image("arrowDropDown")
                     .foregroundStyle(.tint)
-            }.onTapGesture {
-                
             }
             
             HStack(alignment: .lastTextBaseline) {
