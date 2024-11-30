@@ -33,7 +33,7 @@ struct HomeScreenView: View {
                     .foregroundStyle(Color.white)
                 Text(" CONVERT".uppercased())
                     .font(.system(size: 20, weight: .black))
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(AppColor.lightColor)
                     .tracking(22)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: UIScreen.main.bounds.height / 2)
