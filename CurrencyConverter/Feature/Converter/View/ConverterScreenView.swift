@@ -45,16 +45,15 @@ struct ConverterScreenView: View {
             
             ScrollView(.vertical) {
                 LazyVStack(spacing: 0) {
-                    ForEach(viewModel.screenState.selectedCountryList, id: \.self) { code in
-                        let currency = viewModel.getCurrency(code: code)
-                            CurrencyRowView(
-                                currency: currency!,
-                                countryCode: code,
-                                value: value * (viewModel.getConversionRate(for: currency!.code))
-                            ).onTapGesture {
-                                isCountryListPopupShown = true
-                                inputType = .converted(current: code)
-                            }
+                    ForEach(viewModel.screenState.selectedCountryList, id: \.self) { item in
+                        CurrencyRowView(
+                            currency: item.currency,
+                            countryCode: item.code,
+                            value: value * (viewModel.getConversionRate(for: item.currency.code))
+                        ).onTapGesture {
+                            isCountryListPopupShown = true
+                            inputType = .converted(current: item.code)
+                        }
                     }
                 }
             }
@@ -68,7 +67,7 @@ struct ConverterScreenView: View {
             case .converted(let current):
                 [current]
             case .new:
-                viewModel.screenState.selectedCountryList
+                viewModel.screenState.selectedCountryList.map({ $0.code })
             }
             
             SearchListScreenView(
@@ -84,7 +83,7 @@ struct ConverterScreenView: View {
                         guard let newCode = result.first else { return }
                         viewModel.updateSelectedCountryToConvert(old: current, new: newCode)
                     case .new:
-                        viewModel.addCountryFromConversion(countryList: result)
+                        viewModel.addCountryToSelection(countryList: result)
                     }
 
                     isCountryListPopupShown = false

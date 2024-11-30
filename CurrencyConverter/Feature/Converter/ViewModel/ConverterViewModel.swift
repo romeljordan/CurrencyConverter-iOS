@@ -12,13 +12,12 @@ extension ConverterScreenView {
     struct ConverterScreenViewState {
         var countryList: [Country] = []
         var latestRates: [String : Double] = [:]
-        var selectedCountryList: [String] = []
+        var selectedCountryList: [Country] = []
         var baseCountry: String = ""
         
         mutating func update(
             countryList: [Country]? = nil,
             latestRates: [String : Double]? = nil,
-            selectedCountryList: [String]? = nil,
             baseCountry: String? = nil
         ) {
             if countryList != nil {
@@ -29,22 +28,38 @@ extension ConverterScreenView {
                 self.latestRates = latestRates!
             }
             
-            if selectedCountryList != nil {
-                self.selectedCountryList = selectedCountryList!
-            }
-            
             if baseCountry != nil {
                 self.baseCountry = baseCountry!
             }
         }
+        
+        mutating func addToSelectedCountry(code: String) {
+            countryList
+                .filter( { $0.code.lowercased() == code.lowercased() } )
+                .forEach { item in
+                    if (!selectedCountryList.contains(item)) {
+                        selectedCountryList.append(item)
+                    }
+                }
+        }
+        
+        mutating func removeToSelectedCountry(code: String) {
+            selectedCountryList.removeAll(where: { $0.code.lowercased() == code.lowercased() })
+        }
+        
+        mutating func updateSelected(oldCode: String, newCode: String) {
+            guard let selectedIndex = selectedCountryList
+                .firstIndex(where: { $0.code.lowercased() == oldCode.lowercased() }) else { return }
+            
+            guard let newCountry = countryList
+                .filter({ $0.code.lowercased() == newCode.lowercased() })
+                .first else { return }
+            
+            selectedCountryList[selectedIndex] = newCountry
+        }
     }
     
     class ConverterViewModel: ObservableObject {
-//        @Published private(set) var countries: [Country] = []
-//        @Published private(set) var rates: [String: Double] = [:]
-//        @Published private(set) var countryConvertList: [String] = []
-//        @Published private(set) var baseCountry: String = "us"
-        
         @Published private(set) var screenState: ConverterScreenViewState = ConverterScreenViewState(baseCountry: "us")
         
         private let conversionUseCase: ConversionUseCase
@@ -63,7 +78,6 @@ extension ConverterScreenView {
             countryUseCase.loadCountries().subscribe { event in
                 switch event {
                 case .success(let value):
-//                    self.countries = value
                     self.screenState.update(countryList: value)
                     self.loadCurrentRates()
                 case .failure(let error):
@@ -81,8 +95,6 @@ extension ConverterScreenView {
                     switch event {
                     case.success(let value):
                         self.screenState.update(latestRates: value)
-//                        self.rates = value
-//                        print("[DEBUG] rates: \(self.rates)")
                     case .failure(let error):
                         print("Error fetching of current rates: \(error)")
                     }
@@ -96,22 +108,14 @@ extension ConverterScreenView {
             return country.currency
         }
         
-        func addCountryFromConversion(countryList: [String]) {
+        func addCountryToSelection(countryList: [String]) {
             countryList.forEach { code in
-                if (!screenState.selectedCountryList.contains(code)) {
-//                    countryConvertList.append(code)
-                    var copy = screenState.selectedCountryList.map { $0 }
-                    copy.append(code)
-                    screenState.update(selectedCountryList: copy)
-                }
+                screenState.addToSelectedCountry(code: code)
             }
         }
         
-        func removeCountryFromConversion(code: String) {
-            var copy = screenState.selectedCountryList.map { $0 }
-            copy.removeAll(where: { code == $0 })
-                
-            screenState.update(selectedCountryList: copy)
+        func removeCountryFromSelection(code: String) {
+            screenState.removeToSelectedCountry(code: code)
         }
         
         func updateBaseCountry(code: String) {
@@ -124,12 +128,7 @@ extension ConverterScreenView {
         }
         
         func updateSelectedCountryToConvert(old: String, new: String) {
-            guard let index = screenState.selectedCountryList.firstIndex(where: { $0 == old }) else { return }
-            
-            var copy = screenState.selectedCountryList.map { $0 }
-            copy[index] = new
-            
-            screenState.update(selectedCountryList: copy)
+            screenState.updateSelected(oldCode: old, newCode: new)
         }
         
         func getConversionRate(for code: String) -> Double {
