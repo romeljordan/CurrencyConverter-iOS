@@ -89,7 +89,7 @@ struct ConverterScreenView: View {
                     isCountryListPopupShown = false
                 }
             )
-                .presentationDetents([.fraction(1), .fraction(0.85)])
+                .presentationDetents([.fraction(1), .fraction(1)])
                 .presentationDragIndicator(.hidden)
         })
     }
