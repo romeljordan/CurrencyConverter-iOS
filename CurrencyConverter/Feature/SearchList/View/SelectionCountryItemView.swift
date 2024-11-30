@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SearchItemView: View {
+struct SelectionCountryItemView: View {
     var countryCode: String
     var countryName: String
     var isSelected: Bool = false
@@ -55,6 +55,6 @@ struct SearchItemView: View {
 }
 
 #Preview {
-    SearchItemView(countryCode: "us", name: "United States", isSelected: true)
+    SelectionCountryItemView(countryCode: "us", name: "United States", isSelected: true)
         .background(Color.black)
 }

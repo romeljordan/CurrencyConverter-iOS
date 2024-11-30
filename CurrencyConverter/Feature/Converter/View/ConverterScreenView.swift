@@ -70,7 +70,7 @@ struct ConverterScreenView: View {
                 viewModel.screenState.selectedCountryList.map({ $0.code })
             }
             
-            SearchListScreenView(
+            SelectionCountryListScreenView(
                 list: viewModel.screenState.countryList,
                 initialSelected: selectedList,
                 isMultiple: (inputType == .new),

@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  SelectionCountryListScreenView.swift
 //  CurrencyConverter
 //
 //  Created by androiddev on 11/18/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SearchListScreenView: View {
+struct SelectionCountryListScreenView: View {
     var list: [Country]
     var isMultiple: Bool = true
     var initialSelected: [String] = []
@@ -82,7 +82,7 @@ struct SearchListScreenView: View {
                 LazyVStack(spacing: 12) {
                     let shownList = getSortedList()
                     ForEach(shownList, id: \.self) { item in
-                        SearchItemView(
+                        SelectionCountryItemView(
                             countryCode: item.code,
                             name: item.name,
                             isSelected: selected.contains(item.code),
@@ -127,7 +127,7 @@ struct SearchListScreenView: View {
 }
 
 #Preview {
-    SearchListScreenView(
+    SelectionCountryListScreenView(
         list: [Country(name: "United States", code: "us", currency: Currency(name: "Us Dollar", code: "usd"))],
         initialSelected: ["us"]
     ) { results in
