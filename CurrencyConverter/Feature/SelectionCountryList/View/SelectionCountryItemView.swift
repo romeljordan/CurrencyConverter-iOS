@@ -32,11 +32,6 @@ struct SelectionCountryItemView: View {
                 .foregroundStyle(Color.white)
                 .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
             Spacer()
-//            Toggle(isOn: $isSelected, label: {})
-//                .onTapGesture {
-//                    isSelected = !isSelected
-//                    onToggleListener?(isSelected)
-//                }
             
             Image(systemName: "checkmark.circle.fill")
                 .frame(width: 24, height: 24)
