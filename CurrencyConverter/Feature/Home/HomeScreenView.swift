@@ -7,7 +7,17 @@
 
 import SwiftUI
 
+enum HomeNavResult {
+    case MoveToConverter
+}
+
 struct HomeScreenView: View {
+    
+    var onNavResult: (_ result: HomeNavResult) -> Void
+    
+    init(onNavResult: @escaping (_: HomeNavResult) -> Void) {
+        self.onNavResult = onNavResult
+    }
     
     var body: some View {
         VStack {
@@ -32,7 +42,9 @@ struct HomeScreenView: View {
                 Spacer()
                 
                 Button(
-                    action: {},
+                    action: {
+                        onNavResult(HomeNavResult.MoveToConverter)
+                    },
                     label: {
                         Text("Get Started")
                             .font(Font.system(size: 20, weight: .semibold))
@@ -54,5 +66,5 @@ struct HomeScreenView: View {
 }
 
 #Preview {
-    HomeScreenView()
+    HomeScreenView(onNavResult: { _ in })
 }
