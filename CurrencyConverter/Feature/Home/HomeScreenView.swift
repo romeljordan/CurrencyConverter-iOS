@@ -17,9 +17,14 @@ struct HomeScreenView: View {
                     .frame(width: 175, height: 175)
                     .aspectRatio(contentMode: .fit)
                 
-                Text("Currency Convert".uppercased())
-                    .font(.system(size: 30, weight: .bold))
+                Text("Currency".uppercased())
+                    .frame(alignment: .center)
+                    .font(.system(size: 45, weight: .bold))
                     .foregroundStyle(Color.white)
+                Text(" CONVERT".uppercased())
+                    .font(.system(size: 20, weight: .black))
+                    .foregroundStyle(Color.white)
+                    .tracking(22)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: UIScreen.main.bounds.height / 2)
             
