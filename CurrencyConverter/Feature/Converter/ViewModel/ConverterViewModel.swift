@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-extension ConverterScreenView {
+extension CurrencyConvertScreenView {
     struct ConverterScreenViewState {
         var countryList: [Country] = []
         var latestRates: [String : Double] = [:]

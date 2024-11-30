@@ -1,5 +1,5 @@
 //
-//  ConverterScreenView.swift
+//  CurrencyConvertScreenView.swift
 //  CurrencyConverter
 //
 //  Created by androiddev on 11/18/24.
@@ -7,12 +7,22 @@
 
 import SwiftUI
 
-struct ConverterScreenView: View {
+enum ConverterNavResult {
+    case MoveBack
+}
+
+struct CurrencyConvertScreenView: View {
     @ObservedObject var viewModel: ConverterViewModel = ConverterViewModel(conversionUseCase: ConversionUseCaseImpl(repository: ConversionRepositoryImpl()), countryUseCase: CountryUsecaseImpl(repository: CountryRepositoryImpl()))
     
     @State var value: Double = 0
     @State var isCountryListPopupShown = false
     @State var inputType: InputType = .new
+    
+    var onNavResult: (_ result: ConverterNavResult) -> Void
+    
+    init(onNavResult: @escaping (_: ConverterNavResult) -> Void) {
+        self.onNavResult = onNavResult
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -96,5 +106,5 @@ struct ConverterScreenView: View {
 }
 
 #Preview {
-    ConverterScreenView()
+    CurrencyConvertScreenView(onNavResult: { _ in })
 }
