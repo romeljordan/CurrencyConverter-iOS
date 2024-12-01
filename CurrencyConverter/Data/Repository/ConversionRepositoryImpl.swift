@@ -13,7 +13,8 @@ final class ConversionRepositoryImpl : ConversionRepository {
         return Single.create { single in
             
             let headers: HTTPHeaders = [.authorization(bearerToken: "fxr_live_c54bd208277d0cbcfad867df77d9b2c259a3")]
-            let request = AF.request("https://api.fxratesapi.com/latest", method: .get, headers: headers)
+            let parameters: Parameters = ["base" : baseCurrency.uppercased()]
+            let request = AF.request("https://api.fxratesapi.com/latest", method: .get, parameters: parameters, headers: headers)
                 .validate()
                 .responseDecodable(of: RatesDto.self) { response in
                     switch response.result {
