@@ -11,13 +11,17 @@ struct BaseCurrencyRowView: View {
     var currency: Currency
     var countryCode: String
     var onValueChanged: ((_ newValue: Double) -> Void)? = nil
+    var onUpdateValueListener: (() -> Void)? = nil
     
     @State var value: String = "0"
     
-    init(currency: Currency, countryCode: String, onValueChanged: ((_ newValue: Double) -> Void)? = nil) {
+    init(
+        currency: Currency, countryCode: String, onUpdateValueListener: (() -> Void)? = nil, onValueChanged: ((_ newValue: Double) -> Void)? = nil
+    ) {
         self.currency = currency
         self.countryCode = countryCode
         self.onValueChanged = onValueChanged
+        self.onUpdateValueListener = onUpdateValueListener
     }
     
     var body: some View {
@@ -39,14 +43,13 @@ struct BaseCurrencyRowView: View {
                 
                 Spacer()
                 
-                Button {
-                    // TODO: add click functionality
-                } label: {
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(Color.gray)
-                }
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(Color.gray)
             }
             .padding(EdgeInsets(top: 0, leading: 0, bottom: 16, trailing: 0))
+            .onTapGesture {
+                onUpdateValueListener?()
+            }
             
             TextField("", text: $value)
                 .textFieldStyle(WhiteRoundedBorder())

@@ -47,7 +47,11 @@ struct CurrencyConvertScreenView: View {
             if (baseCurrency != nil) {
                 BaseCurrencyRowView(
                     currency: baseCurrency!,
-                    countryCode: viewModel.screenState.baseCountry
+                    countryCode: viewModel.screenState.baseCountry,
+                    onUpdateValueListener: {
+                        isCountryListPopupShown = true
+                        inputType = .base
+                    }
                 ) { newValue in
                     value = newValue
                 }
@@ -59,11 +63,18 @@ struct CurrencyConvertScreenView: View {
                         CurrencyRowView(
                             currency: item.currency,
                             countryCode: item.code,
-                            value: value * (viewModel.getConversionRate(for: item.currency.code))
+                            value: value * (viewModel.getConversionRate(for: item.currency.code)),
+                            onDelete: {
+                                viewModel.removeCountryFromSelection(code: item.code)
+                            }
                         ).onTapGesture {
                             isCountryListPopupShown = true
                             inputType = .converted(current: item.code)
                         }
+                        .swipeActions(edge: .trailing, content: {
+                            Text("Delete")
+                                .foregroundStyle(Color.red)
+                        })
                     }
                 }
             }
@@ -81,16 +92,30 @@ struct CurrencyConvertScreenView: View {
             }
             
             SelectionCountryListScreenView(
-                list: viewModel.screenState.countryList,
+                list: viewModel.screenState.countryList
+                    .filter { item in
+                        switch inputType {
+                        case .base:
+                            !viewModel.screenState.selectedCountryList.contains(item)
+                        case .converted(let current):
+                            viewModel.screenState.selectedCountryList
+                                .filter({ current.lowercased() != $0.code.lowercased() })
+                                .contains(where: {
+                                    item.code.lowercased() != $0.code.lowercased() && item.code.lowercased() != viewModel.screenState.baseCountry.lowercased()
+                                })
+                        case .new:
+                            item.code.lowercased() != viewModel.screenState.baseCountry.lowercased()
+                        }
+                    },
                 initialSelected: selectedList,
                 isMultiple: (inputType == .new),
                 onResults: { result in
                     switch inputType {
                     case .base:
-                        guard let code = result.first else { return }
+                        guard let code = result.first else { break }
                         viewModel.updateBaseCountry(code: code)
                     case .converted(let current):
-                        guard let newCode = result.first else { return }
+                        guard let newCode = result.first else { break }
                         viewModel.updateSelectedCountryToConvert(old: current, new: newCode)
                     case .new:
                         viewModel.addCountryToSelection(countryList: result)

@@ -11,13 +11,15 @@ struct SelectionCountryItemView: View {
     var countryCode: String
     var countryName: String
     var isSelected: Bool = false
+    var isSingleMode: Bool = false
     
     var onToggleListener: ((Bool) -> Void)? = nil
     
-    init(countryCode: String, name: String, isSelected: Bool, onToggleListener: ((Bool) -> Void)? = nil) {
+    init(countryCode: String, name: String, isSelected: Bool, isSingleMode: Bool, onToggleListener: ((Bool) -> Void)? = nil) {
         self.countryCode = countryCode
         self.countryName = name
         self.isSelected = isSelected
+        self.isSingleMode = isSingleMode
         self.onToggleListener = onToggleListener
     }
     
@@ -33,23 +35,26 @@ struct SelectionCountryItemView: View {
                 .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
             Spacer()
             
-            Image(systemName: "checkmark.circle.fill")
-                .frame(width: 24, height: 24)
-                .aspectRatio(contentMode: .fill)
-                .foregroundStyle(
-                    (isSelected) ? Color.green : Color.gray
-                )
-                .onTapGesture(perform: {
-                    onToggleListener?(!isSelected)
-                })
-            
-            
+            if !isSingleMode {
+                Image(systemName: "checkmark.circle.fill")
+                    .frame(width: 24, height: 24)
+                    .aspectRatio(contentMode: .fill)
+                    .foregroundStyle(
+                        (isSelected) ? Color.green : Color.gray
+                    )
+            }
         }
         .padding(EdgeInsets(top: 8, leading: 4, bottom: 8, trailing: 4))
+        .background(
+            (isSingleMode && isSelected) ? AppColor.secondary : Color.clear
+        )
+        .onTapGesture(perform: {
+            onToggleListener?(!isSelected)
+        })
     }
 }
 
 #Preview {
-    SelectionCountryItemView(countryCode: "us", name: "United States", isSelected: true)
+    SelectionCountryItemView(countryCode: "us", name: "United States", isSelected: true, isSingleMode: true)
         .background(Color.black)
 }

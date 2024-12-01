@@ -86,6 +86,7 @@ struct SelectionCountryListScreenView: View {
                             countryCode: item.code,
                             name: item.name,
                             isSelected: selected.contains(item.code),
+                            isSingleMode: !isMultiple,
                             onToggleListener: { value in
                                 if (isMultiple) {
                                     switch value {
