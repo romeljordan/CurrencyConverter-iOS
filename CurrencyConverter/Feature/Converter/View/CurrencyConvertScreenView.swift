@@ -63,11 +63,18 @@ struct CurrencyConvertScreenView: View {
                         CurrencyRowView(
                             currency: item.currency,
                             countryCode: item.code,
-                            value: value * (viewModel.getConversionRate(for: item.currency.code))
+                            value: value * (viewModel.getConversionRate(for: item.currency.code)),
+                            onDelete: {
+                                viewModel.removeCountryFromSelection(code: item.code)
+                            }
                         ).onTapGesture {
                             isCountryListPopupShown = true
                             inputType = .converted(current: item.code)
                         }
+                        .swipeActions(edge: .trailing, content: {
+                            Text("Delete")
+                                .foregroundStyle(Color.red)
+                        })
                     }
                 }
             }

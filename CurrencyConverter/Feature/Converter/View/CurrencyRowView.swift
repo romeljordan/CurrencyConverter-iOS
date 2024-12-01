@@ -11,11 +11,13 @@ struct CurrencyRowView: View {
     var currency: Currency
     var countryCode: String
     var value: Double
+    var onDelete: (() -> Void)? = nil
     
-    init(currency: Currency, countryCode: String, value: Double) {
+    init(currency: Currency, countryCode: String, value: Double, onDelete: (() -> Void)? = nil) {
         self.currency = currency
         self.countryCode = countryCode
         self.value = value
+        self.onDelete = onDelete
     }
     
     var body: some View {
@@ -25,6 +27,12 @@ struct CurrencyRowView: View {
                     .font(.system(size: 17, weight: .bold))
                     .foregroundStyle(.white)
                 Spacer()
+                
+                Button("", systemImage: "xmark", action: {
+                    onDelete?()
+                })
+                .frame(width: 16, height: 16)
+                .foregroundStyle(Color.gray)
             }
             
             Spacer().frame(height: 8)
@@ -41,7 +49,7 @@ struct CurrencyRowView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 16, height: 16)
                     .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 8))
-                Text(currency.name)
+                Text(currency.name.capitalized)
                     .font(.system(size: 16, weight: .light))
                     .foregroundStyle(.gray)
                 
