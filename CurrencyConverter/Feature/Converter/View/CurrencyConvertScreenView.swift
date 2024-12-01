@@ -85,7 +85,21 @@ struct CurrencyConvertScreenView: View {
             }
             
             SelectionCountryListScreenView(
-                list: viewModel.screenState.countryList,
+                list: viewModel.screenState.countryList
+                    .filter { item in
+                        switch inputType {
+                        case .base:
+                            !viewModel.screenState.selectedCountryList.contains(item)
+                        case .converted(let current):
+                            viewModel.screenState.selectedCountryList
+                                .filter({ current.lowercased() != $0.code.lowercased() })
+                                .contains(where: {
+                                    item.code.lowercased() != $0.code.lowercased() && item.code.lowercased() != viewModel.screenState.baseCountry.lowercased()
+                                })
+                        case .new:
+                            item.code.lowercased() != viewModel.screenState.baseCountry.lowercased()
+                        }
+                    },
                 initialSelected: selectedList,
                 isMultiple: (inputType == .new),
                 onResults: { result in
