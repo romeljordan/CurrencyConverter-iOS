@@ -85,7 +85,7 @@ struct CurrencyConvertScreenView: View {
         .padding()
         .background(Color.black)
         .sheet(isPresented: $isCountryListPopupShown, content: {
-            let selectedList = switch inputType {
+            let selectedItems = switch inputType {
             case .base:
                 [viewModel.screenState.baseCountry]
             case .converted(let current):
@@ -94,24 +94,25 @@ struct CurrencyConvertScreenView: View {
                 viewModel.screenState.selectedCountryList.map({ $0.code })
             }
             
+            let disabledItems = switch inputType {
+            case .base:
+                viewModel.screenState.selectedCountryList.map{ $0.code }
+            case .converted(let current):
+                viewModel.screenState.selectedCountryList
+                    .filter { $0.code != current }
+                    .map{ $0.code } + [viewModel.screenState.baseCountry]
+            case .new:
+                [viewModel.screenState.baseCountry]
+            }
+            
             SelectionCountryListScreenView(
-                list: viewModel.screenState.countryList
-                    .filter { item in
-                        switch inputType {
-                        case .base:
-                            !viewModel.screenState.selectedCountryList.contains(item)
-                        case .converted(let current):
-                            viewModel.screenState.selectedCountryList
-                                .filter({ current.lowercased() != $0.code.lowercased() })
-                                .contains(where: {
-                                    item.code.lowercased() != $0.code.lowercased() && item.code.lowercased() != viewModel.screenState.baseCountry.lowercased()
-                                })
-                        case .new:
-                            item.code.lowercased() != viewModel.screenState.baseCountry.lowercased()
-                        }
-                    },
-                initialSelected: selectedList,
+                list: viewModel.screenState.countryList,
+                initialSelected: selectedItems,
                 isMultiple: (inputType == .new),
+                disabledItems: disabledItems,
+                onClose: {
+                    isCountryListPopupShown = false
+                },
                 onResults: { result in
                     switch inputType {
                     case .base:
