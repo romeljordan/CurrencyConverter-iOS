@@ -12,7 +12,7 @@ enum ConverterNavResult {
 }
 
 struct CurrencyConvertScreenView: View {
-    @ObservedObject var viewModel: ConverterViewModel = ConverterViewModel(
+    @ObservedObject var viewModel: CurrencyConvertViewModel = CurrencyConvertViewModel(
             conversionUseCase:
                 ConversionUseCaseImpl(
                     repository: ConversionRepositoryImpl(

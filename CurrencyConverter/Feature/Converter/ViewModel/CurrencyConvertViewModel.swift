@@ -59,7 +59,7 @@ extension CurrencyConvertScreenView {
         }
     }
     
-    class ConverterViewModel: ObservableObject {
+    class CurrencyConvertViewModel: ObservableObject {
         @Published private(set) var screenState: ConverterScreenViewState = ConverterScreenViewState(baseCountry: "us")
         
         private let conversionUseCase: ConversionUseCase
