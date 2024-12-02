@@ -12,7 +12,23 @@ enum ConverterNavResult {
 }
 
 struct CurrencyConvertScreenView: View {
-    @ObservedObject var viewModel: ConverterViewModel = ConverterViewModel(conversionUseCase: ConversionUseCaseImpl(repository: ConversionRepositoryImpl()), countryUseCase: CountryUsecaseImpl(repository: CountryRepositoryImpl()))
+    @ObservedObject var viewModel: ConverterViewModel = ConverterViewModel(
+            conversionUseCase:
+                ConversionUseCaseImpl(
+                    repository: ConversionRepositoryImpl(
+                        dataSource: AppRemoteDataSourceImpl(
+                            appService: AppService()
+                        )
+                    )
+                ),
+            countryUseCase: CountryUsecaseImpl(
+                repository: CountryRepositoryImpl(
+                    dataSource: AppRemoteDataSourceImpl(
+                        appService: AppService()
+                    )
+                )
+            )
+        )
     
     @State var value: Double = 0
     @State var isCountryListPopupShown = false

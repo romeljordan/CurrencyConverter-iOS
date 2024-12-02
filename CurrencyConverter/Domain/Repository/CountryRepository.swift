@@ -8,5 +8,5 @@
 import RxSwift
 
 protocol CountryRepository {
-    func loadCountries() -> Single<[CountryDto]>
+    func loadCountries() -> Single<[Country]>
 }

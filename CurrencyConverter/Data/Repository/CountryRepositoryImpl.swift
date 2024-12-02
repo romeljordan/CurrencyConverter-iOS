@@ -9,27 +9,24 @@ import Alamofire
 import RxSwift
 
 final class CountryRepositoryImpl : CountryRepository {
+    var dataSource: AppRemoteDataSourceImpl!
     
-    func loadCountries() -> Single<[CountryDto]> {
+    init(dataSource: AppRemoteDataSourceImpl) {
+        self.dataSource = dataSource
+    }
+    
+    func loadCountries() -> Single<[Country]> {
         return Single.create { single in
-            let request = AF.request("https://restcountries.com/v3.1/all?fields=name,currencies,cca2")
-                .validate()
-                .responseDecodable(of: Array<CountryDto>.self) { response in
-                    switch response.result {
-                    case .success(let value):
-                        single(.success(value))
-                    case .failure(let error):
-                        single(.failure(error))
-                    }
+            self.dataSource.loadCountryList().subscribe(
+                onSuccess: { items in
+                    single(.success(items.map({ dto in
+                        dto.toDomainModel()
+                    })))
+                },
+                onFailure: { error in
+                    single(.failure(error))
                 }
-            return Disposables.create { request.cancel() }
+            )
         }
-        
-//        return Single.just([
-//            Country(name: "Vietnam", code: "vn", currency: Currency(name: "Vietnam Dong", code: "vnd")),
-//            Country(name: "Philippines", code: "ph", currency: Currency(name: "Philippine Peso", code: "php")),
-//            Country(name: "USA", code: "us", currency: Currency(name: "US Dollar", code: "usd"))
-//        ])
-        // TODO: add real data from rest country API
     }
 }
