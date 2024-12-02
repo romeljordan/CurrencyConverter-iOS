@@ -19,6 +19,6 @@ class ConversionUseCaseImpl: ConversionUseCase {
     }
     
     func loadCurrentRates(baseCurrency: String) -> Single<[String : Double]> {
-        return repository.loadCurrentRates(baseCurrency: baseCurrency)
+        return repository.loadCurrentRates(baseCurrency: baseCurrency) // TODO: add do-catch statement
     }
 }

@@ -21,10 +21,10 @@ extension CountryDto {
     public func toDomainModel() -> Country {
         return Country(
             name: name.common,
-            code: cca2,
+            code: cca2.lowercased(),
             currency: Currency(
                 name: currencies.first?.value.name ?? "",
-                code: currencies.first?.key ?? ""
+                code: currencies.first?.key.lowercased() ?? ""
             )
         )
     }
