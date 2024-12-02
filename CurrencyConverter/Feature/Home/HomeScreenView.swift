@@ -49,6 +49,7 @@ struct HomeScreenView: View {
                         Text("Get Started")
                             .font(Font.system(size: 20, weight: .semibold))
                             .foregroundStyle(Color.white)
+                            .frame(minWidth: 0, maxWidth: .infinity)
                     }
                 )
                 .padding()
