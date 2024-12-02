@@ -1,5 +1,5 @@
 //
-//  ConversionRemoteDataSourceImpl.swift
+//  AppRemoteDataSourceImpl.swift
 //  CurrencyConverter
 //
 //  Created by androiddev on 12/2/24.
@@ -9,11 +9,10 @@ import Alamofire
 import RxSwift
 
 final class AppRemoteDataSourceImpl {
-    var appService: AppService!
+    static let shared = AppRemoteDataSourceImpl()
+    private let appService: AppService = AppService.shared
     
-    init(appService: AppService!) {
-        self.appService = appService
-    }
+    private init() { }
     
     func loadCountryList() -> Single<[CountryDto]> {
         return appService.getCountries()

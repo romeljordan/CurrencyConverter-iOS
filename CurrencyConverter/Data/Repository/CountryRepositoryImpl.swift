@@ -9,11 +9,7 @@ import Alamofire
 import RxSwift
 
 final class CountryRepositoryImpl : CountryRepository {
-    var dataSource: AppRemoteDataSourceImpl!
-    
-    init(dataSource: AppRemoteDataSourceImpl) {
-        self.dataSource = dataSource
-    }
+    private let dataSource: AppRemoteDataSourceImpl = AppRemoteDataSourceImpl.shared
     
     func loadCountries() -> Single<[Country]> {
         return Single.create { single in

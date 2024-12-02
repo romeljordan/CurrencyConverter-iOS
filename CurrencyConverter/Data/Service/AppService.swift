@@ -9,6 +9,10 @@ import Alamofire
 import RxSwift
 
 final class AppService {
+    static let shared = AppService()
+    
+    private init() { }
+    
     func getCountries() -> Single<[CountryDto]> {
         return Single.create { single in
             let url = "\(AppConfig.REST_API_BASE_URL)/all"

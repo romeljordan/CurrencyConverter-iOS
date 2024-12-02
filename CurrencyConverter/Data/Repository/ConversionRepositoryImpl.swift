@@ -9,11 +9,7 @@ import Alamofire
 import RxSwift
 
 final class ConversionRepositoryImpl : ConversionRepository {
-    var dataSource: AppRemoteDataSourceImpl!
-    
-    init(dataSource: AppRemoteDataSourceImpl) {
-        self.dataSource = dataSource
-    }
+    private let dataSource: AppRemoteDataSourceImpl = AppRemoteDataSourceImpl.shared
     
     func loadCurrentRates(baseCurrency: String) -> Single<[String : Double]> {
         return Single.create { single in
