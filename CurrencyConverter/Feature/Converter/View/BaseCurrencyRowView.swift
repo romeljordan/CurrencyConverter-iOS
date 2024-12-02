@@ -47,6 +47,7 @@ struct BaseCurrencyRowView: View {
                     .foregroundStyle(Color.gray)
             }
             .padding(EdgeInsets(top: 0, leading: 0, bottom: 16, trailing: 0))
+            .contentShape(Rectangle())
             .onTapGesture {
                 onUpdateValueListener?()
             }

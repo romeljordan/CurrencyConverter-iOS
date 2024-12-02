@@ -12,11 +12,14 @@ enum ConverterNavResult {
 }
 
 struct CurrencyConvertScreenView: View {
-    @ObservedObject var viewModel: ConverterViewModel = ConverterViewModel(conversionUseCase: ConversionUseCaseImpl(repository: ConversionRepositoryImpl()), countryUseCase: CountryUsecaseImpl(repository: CountryRepositoryImpl()))
+    @ObservedObject var viewModel: CurrencyConvertViewModel = CurrencyConvertViewModel(
+        conversionUseCase: ConversionUseCaseImpl(repository: ConversionRepositoryImpl()),
+        countryUseCase: CountryUsecaseImpl(repository: CountryRepositoryImpl())
+    )
     
     @State var value: Double = 0
     @State var isCountryListPopupShown = false
-    @State var inputType: InputType = .new
+    @State var countryListInputType: InputType? = nil
     
     var onNavResult: (_ result: ConverterNavResult) -> Void
     
@@ -35,8 +38,7 @@ struct CurrencyConvertScreenView: View {
                 Spacer()
                 
                 Button {
-                    isCountryListPopupShown = true
-                    inputType = .new
+                    countryListInputType = .new
                 } label: {
                     Image(systemName: "plus")
                         .foregroundStyle(Color.white)
@@ -49,8 +51,7 @@ struct CurrencyConvertScreenView: View {
                     currency: baseCurrency!,
                     countryCode: viewModel.screenState.baseCountry,
                     onUpdateValueListener: {
-                        isCountryListPopupShown = true
-                        inputType = .base
+                        countryListInputType = .base
                     }
                 ) { newValue in
                     value = newValue
@@ -68,8 +69,7 @@ struct CurrencyConvertScreenView: View {
                                 viewModel.removeCountryFromSelection(code: item.code)
                             }
                         ).onTapGesture {
-                            isCountryListPopupShown = true
-                            inputType = .converted(current: item.code)
+                            countryListInputType = .converted(current: item.code)
                         }
                         .swipeActions(edge: .trailing, content: {
                             Text("Delete")
@@ -82,35 +82,32 @@ struct CurrencyConvertScreenView: View {
         .padding()
         .background(Color.black)
         .sheet(isPresented: $isCountryListPopupShown, content: {
-            let selectedList = switch inputType {
-            case .base:
-                [viewModel.screenState.baseCountry]
-            case .converted(let current):
-                [current]
-            case .new:
-                viewModel.screenState.selectedCountryList.map({ $0.code })
+            let selectedItems = switch countryListInputType {
+            case .base: [viewModel.screenState.baseCountry]
+            case .converted(let current): [current]
+            case .new: viewModel.screenState.selectedCountryList.map({ $0.code })
+            case .none: [String]()
+            }
+            
+            let disabledItems = switch countryListInputType {
+            case .base: viewModel.screenState.selectedCountryList.map{ $0.code }
+            case .converted(let current): viewModel.screenState.selectedCountryList
+                    .filter { $0.code != current }
+                    .map{ $0.code } + [viewModel.screenState.baseCountry]
+            case .new: [viewModel.screenState.baseCountry]
+            case .none: [String]()
             }
             
             SelectionCountryListScreenView(
-                list: viewModel.screenState.countryList
-                    .filter { item in
-                        switch inputType {
-                        case .base:
-                            !viewModel.screenState.selectedCountryList.contains(item)
-                        case .converted(let current):
-                            viewModel.screenState.selectedCountryList
-                                .filter({ current.lowercased() != $0.code.lowercased() })
-                                .contains(where: {
-                                    item.code.lowercased() != $0.code.lowercased() && item.code.lowercased() != viewModel.screenState.baseCountry.lowercased()
-                                })
-                        case .new:
-                            item.code.lowercased() != viewModel.screenState.baseCountry.lowercased()
-                        }
-                    },
-                initialSelected: selectedList,
-                isMultiple: (inputType == .new),
+                list: viewModel.screenState.countryList,
+                initialSelected: selectedItems,
+                isMultiple: (countryListInputType == .new),
+                disabledItems: disabledItems,
+                onClose: {
+                    countryListInputType = nil
+                },
                 onResults: { result in
-                    switch inputType {
+                    switch countryListInputType {
                     case .base:
                         guard let code = result.first else { break }
                         viewModel.updateBaseCountry(code: code)
@@ -119,14 +116,18 @@ struct CurrencyConvertScreenView: View {
                         viewModel.updateSelectedCountryToConvert(old: current, new: newCode)
                     case .new:
                         viewModel.addCountryToSelection(countryList: result)
+                    case .none: countryListInputType = nil
                     }
 
-                    isCountryListPopupShown = false
+                    countryListInputType = nil
                 }
             )
                 .presentationDetents([.fraction(1), .fraction(1)])
                 .presentationDragIndicator(.hidden)
         })
+        .onChange(of: countryListInputType) { value in
+            isCountryListPopupShown = (countryListInputType != nil)
+        }
     }
 }
 

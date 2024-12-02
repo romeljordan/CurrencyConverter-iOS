@@ -10,19 +10,28 @@ import SwiftUI
 struct SelectionCountryListScreenView: View {
     var list: [Country]
     var isMultiple: Bool = true
-    var initialSelected: [String] = []
     
     var onResults: ([String]) -> Void
+    var onClose: (() -> Void)? = nil
     
     @State var searchText: String = ""
     @State var selected: [String] = []
     
-    init(list: [Country], initialSelected: [String] = [], isMultiple: Bool = true, onResults: @escaping ([String]) -> Void) {
-        self.list = list.sorted(by: { $0.name < $1.name })
+    init(
+        list: [Country],
+        initialSelected: [String] = [],
+        isMultiple: Bool = true,
+        disabledItems: [String] = [],
+        onClose: (() -> Void)? = nil,
+        onResults: @escaping ([String]) -> Void
+    ) {
+        self.list = list
+            .sorted(by: { $0.name < $1.name })
+            .filter { !disabledItems.contains($0.code) }
         self.isMultiple = isMultiple
         self.selected = initialSelected
-        self.initialSelected = initialSelected
         self.onResults = onResults
+        self.onClose = onClose
     }
     
     var body: some View {
@@ -32,7 +41,7 @@ struct SelectionCountryListScreenView: View {
                     "",
                     systemImage: "arrow.left",
                     action: {
-                        onResults(initialSelected)
+                        onClose?()
                     }
                 )
                     .foregroundStyle(Color.white)
@@ -78,33 +87,39 @@ struct SelectionCountryListScreenView: View {
             .padding(EdgeInsets(top: 2, leading: 4, bottom: 2, trailing: 4))
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray))
             
-            ScrollView(.vertical) {
-                LazyVStack(spacing: 12) {
-                    let shownList = getSortedList()
-                    ForEach(shownList, id: \.self) { item in
-                        SelectionCountryItemView(
-                            countryCode: item.code,
-                            name: item.name,
-                            isSelected: selected.contains(item.code),
-                            isSingleMode: !isMultiple,
-                            onToggleListener: { value in
-                                if (isMultiple) {
-                                    switch value {
-                                    case true:
-                                        selected.append(item.code)
-                                    case false:
-                                        selected.removeAll(where: { $0 == item.code })
+            ScrollViewReader { scrollValue in
+                ScrollView(.vertical) {
+                    LazyVStack(spacing: 12) {
+                        let shownList = getSortedList()
+                        ForEach(shownList, id: \.code) { item in
+                            SelectionCountryItemView(
+                                countryCode: item.code,
+                                name: item.name,
+                                isSelected: selected.contains(item.code),
+                                isSingleMode: !isMultiple,
+                                onToggleListener: { value in
+                                    if (isMultiple) {
+                                        switch value {
+                                        case true:
+                                            selected.append(item.code)
+                                        case false:
+                                            selected.removeAll(where: { $0 == item.code })
+                                        }
+                                    } else {
+                                        onResults([item.code])
                                     }
-                                } else {
-                                    onResults([item.code])
                                 }
-                            }
-                        )
+                            )
+                        }
+                    }
+                    .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                }
+                .onAppear {
+                    if !isMultiple {
+                        scrollValue.scrollTo(selected.first, anchor: .center)
                     }
                 }
-                .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
             }
-            
         }
         .padding()
         .background(Color.black)
