@@ -116,7 +116,8 @@ struct SelectionCountryListScreenView: View {
                 }
                 .onAppear {
                     if !isMultiple {
-                        scrollValue.scrollTo(selected.first, anchor: .center)
+                        guard let key = selected.first else { return }
+                        scrollValue.scrollTo(key, anchor: .topLeading)
                     }
                 }
             }
